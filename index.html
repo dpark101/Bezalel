@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DTP</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #222222;
+      --text-primary: #f0f0f0;
+      --text-secondary: #888888;
+      --accent: #e8e8e8;
+      --hover-bg: #1a1a1a;
+      --dropdown-bg: #141414;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ─────────────────────────────────────────── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 56px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      text-decoration: none;
+      user-select: none;
+    }
+
+    /* ── DROPDOWN ────────────────────────────────────── */
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-trigger {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      padding: 0.45rem 0.85rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .dropdown-trigger:hover,
+    .dropdown-trigger[aria-expanded="true"] {
+      border-color: #444;
+      color: var(--text-primary);
+    }
+
+    .dropdown-trigger .chevron {
+      width: 10px;
+      height: 10px;
+      transition: transform 0.2s;
+    }
+
+    .dropdown-trigger[aria-expanded="true"] .chevron {
+      transform: rotate(180deg);
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 6px);
+      background: var(--dropdown-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      min-width: 160px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+
+    .dropdown-menu.open {
+      display: block;
+      animation: fadeDown 0.12s ease;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .dropdown-menu a {
+      display: block;
+      padding: 0.65rem 1rem;
+      font-size: 0.82rem;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: background 0.1s, color 0.1s;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dropdown-menu a:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-menu a:hover {
+      background: var(--hover-bg);
+      color: var(--text-primary);
+    }
+
+    .dropdown-menu a .item-label {
+      display: block;
+    }
+
+    /* ── HERO ────────────────────────────────────────── */
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 56px);
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .hero-title {
+      font-size: clamp(4rem, 14vw, 10rem);
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .hero-sub {
+      margin-top: 1.2rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="/">DTP</a>
+
+    <div class="dropdown" id="dropdown">
+      <button
+        class="dropdown-trigger"
+        id="dropbtn"
+        aria-haspopup="true"
+        aria-expanded="false"
+        onclick="toggleDropdown()"
+      >
+        Menu
+        <svg class="chevron" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8">
+          <polyline points="1,3 5,7 9,3" />
+        </svg>
+      </button>
+
+      <div class="dropdown-menu" id="dropmenu" role="menu">
+        <a href="/rolodex" role="menuitem"><span class="item-label">RolodexAI</span></a>
+        <a href="/space1"   role="menuitem"><span class="item-label">Space1</span></a>
+        <a href="/space2"   role="menuitem"><span class="item-label">Space2</span></a>
+        <a href="/space3"   role="menuitem"><span class="item-label">Space3</span></a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <h1 class="hero-title">DTP</h1>
+    <p class="hero-sub">danieltaehyunpark.com</p>
+  </main>
+
+  <script>
+    const btn  = document.getElementById('dropbtn');
+    const menu = document.getElementById('dropmenu');
+
+    function toggleDropdown() {
+      const open = menu.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+    }
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!document.getElementById('dropdown').contains(e.target)) {
+        menu.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        menu.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.focus();
+      }
+    });
+  </script>
+
+</body>
+</html>
