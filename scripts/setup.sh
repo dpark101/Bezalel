@@ -4,6 +4,9 @@
 
 set -euo pipefail
 
+# Always run from the repo root regardless of caller's working directory
+cd "$(dirname "$0")/.."
+
 DOMAIN="danieltaehyunpark.com"
 WEBROOT="/var/www/${DOMAIN}"
 NGINX_CONF="/etc/nginx/sites-available/${DOMAIN}"
