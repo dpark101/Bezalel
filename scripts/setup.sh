@@ -7,7 +7,7 @@ set -euo pipefail
 DOMAIN="danieltaehyunpark.com"
 WEBROOT="/var/www/${DOMAIN}"
 NGINX_CONF="/etc/nginx/sites-available/${DOMAIN}"
-EMAIL="your@email.com"   # <-- change this to your real email for Let's Encrypt
+EMAIL="danieltaehyunpark@gmail.com"
 
 echo "==> Updating packages..."
 apt-get update -qq
