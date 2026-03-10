@@ -5,7 +5,8 @@
 set -euo pipefail
 
 # Always run from the repo root regardless of caller's working directory
-cd "$(dirname "$0")/.."
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/.."
 
 DOMAIN="danieltaehyunpark.com"
 WEBROOT="/var/www/${DOMAIN}"
@@ -23,12 +24,12 @@ echo "==> Creating web root..."
 mkdir -p "${WEBROOT}"
 
 echo "==> Copying site files..."
-cp "$(dirname "$0")/../index.html" "${WEBROOT}/index.html"
+cp index.html "${WEBROOT}/index.html"
 chown -R www-data:www-data "${WEBROOT}"
 chmod -R 755 "${WEBROOT}"
 
 echo "==> Installing Nginx config..."
-cp "$(dirname "$0")/../nginx/${DOMAIN}" "${NGINX_CONF}"
+cp "nginx/${DOMAIN}" "${NGINX_CONF}"
 
 # Temporarily use HTTP-only config for cert issuance
 cat > "${NGINX_CONF}" <<EOF
@@ -62,7 +63,7 @@ certbot --nginx \
     --redirect
 
 echo "==> Installing final Nginx config with security headers..."
-cp "$(dirname "$0")/../nginx/${DOMAIN}" "${NGINX_CONF}"
+cp "nginx/${DOMAIN}" "${NGINX_CONF}"
 nginx -t && systemctl reload nginx
 
 echo "==> Enabling Certbot auto-renewal..."
