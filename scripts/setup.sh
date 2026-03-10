@@ -29,6 +29,7 @@ chown -R www-data:www-data "${WEBROOT}"
 chmod -R 755 "${WEBROOT}"
 
 echo "==> Installing Nginx config..."
+mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
 cp "nginx/${DOMAIN}" "${NGINX_CONF}"
 
 # Temporarily use HTTP-only config for cert issuance
