@@ -15,7 +15,7 @@ EMAIL="danieltaehyunpark@gmail.com"
 
 echo "==> Updating packages..."
 apt-get update -qq
-apt-get upgrade -y -qq
+apt-get upgrade -y -qq --fix-missing || echo "Warning: upgrade incomplete, continuing..."
 
 echo "==> Installing Nginx and Certbot..."
 apt-get install -y nginx certbot python3-certbot-nginx
