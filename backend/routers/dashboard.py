@@ -1,11 +1,11 @@
 """
-Bezalel.AI — Dashboard router.
+Bezalel.AI — News feeds router.
 
 Serves aggregated news items for the home dashboard.
+Frontend fetches ``GET /api/news/feeds``.
 """
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -15,36 +15,17 @@ from middleware.auth_middleware import get_current_user
 from models.news import NewsFeed, NewsItem
 from models.user import User
 
-router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
-
-# ── Response schemas ─────────────────────────────────────────────────────
+router = APIRouter(prefix="/api/news", tags=["news"])
 
 
-class NewsItemOut(BaseModel):
-    id: str
-    title: str
-    url: str
-    published_at: str | None
-    summary: str | None
+# ── GET /feeds ───────────────────────────────────────────────────────────
 
 
-class NewsGroupOut(BaseModel):
-    source_name: str
-    items: list[NewsItemOut]
-
-
-class DashboardNewsResponse(BaseModel):
-    news: list[NewsGroupOut]
-
-
-# ── GET /news ────────────────────────────────────────────────────────────
-
-
-@router.get("/news", response_model=DashboardNewsResponse)
-async def get_dashboard_news(
+@router.get("/feeds")
+async def get_news_feeds(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> DashboardNewsResponse:
+) -> list[dict]:
     """
     Return the latest news items grouped by source (e.g. WSJ, NYT, WaPo).
     Limited to 10 items per source, ordered by published date descending.
@@ -56,7 +37,7 @@ async def get_dashboard_news(
     )
     feeds = result.scalars().all()
 
-    groups: list[NewsGroupOut] = []
+    output: list[dict] = []
     for feed in feeds:
         # Sort items by published_at descending, take top 10.
         sorted_items = sorted(
@@ -65,20 +46,19 @@ async def get_dashboard_news(
             reverse=True,
         )[:10]
 
-        groups.append(
-            NewsGroupOut(
-                source_name=feed.source_name,
-                items=[
-                    NewsItemOut(
-                        id=str(item.id),
-                        title=item.title,
-                        url=item.url,
-                        published_at=item.published_at.isoformat() if item.published_at else None,
-                        summary=item.summary,
-                    )
-                    for item in sorted_items
-                ],
-            )
-        )
+        output.append({
+            "source": feed.source_name,
+            "items": [
+                {
+                    "id": str(item.id),
+                    "title": item.title,
+                    "url": item.url,
+                    "published_at": item.published_at.isoformat() if item.published_at else None,
+                    "summary": item.summary,
+                }
+                for item in sorted_items
+            ],
+            "last_updated": feed.last_fetched.isoformat() if feed.last_fetched else None,
+        })
 
-    return DashboardNewsResponse(news=groups)
+    return output

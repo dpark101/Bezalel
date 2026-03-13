@@ -37,7 +37,7 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 # ── Password hashing (bcrypt, cost factor 12) ───────────────────────────
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12)
 
-# ── In-memory OTP store (maps pre-auth token -> (user_id, otp, expiry))
+# ── In-memory OTP store (maps email -> (user_id, otp, expiry))
 # In production, replace with Redis or a DB-backed store.
 _otp_store: dict[str, tuple[uuid.UUID, str, datetime]] = {}
 
@@ -50,13 +50,14 @@ class LoginRequest(BaseModel):
 
 
 class LoginResponse(BaseModel):
-    pre_auth_token: str
+    requires_otp: bool = True
+    otp_expires_in: int = 600
     message: str = "OTP sent to your email address."
 
 
 class OTPVerifyRequest(BaseModel):
-    pre_auth_token: str
-    otp_code: str
+    email: EmailStr
+    otp: str
 
 
 class UserResponse(BaseModel):
@@ -134,9 +135,8 @@ async def login(
     totp = pyotp.TOTP(user.totp_secret, interval=600, digits=6)
     otp_code = totp.now()
 
-    # Store OTP context with a pre-auth token.
-    pre_auth_token = str(uuid.uuid4())
-    _otp_store[pre_auth_token] = (
+    # Store OTP context keyed by email.
+    _otp_store[body.email.lower()] = (
         user.id,
         otp_code,
         datetime.now(timezone.utc) + timedelta(minutes=10),
@@ -149,7 +149,7 @@ async def login(
         # In production, log this properly.
         pass
 
-    return LoginResponse(pre_auth_token=pre_auth_token)
+    return LoginResponse(requires_otp=True, otp_expires_in=600)
 
 
 # ── POST /verify-otp ────────────────────────────────────────────────────
@@ -165,18 +165,20 @@ async def verify_otp(
     Verify the 6-digit OTP code.  On success, issue a JWT inside an
     HttpOnly secure cookie and create a session record in the database.
     """
-    stored = _otp_store.pop(body.pre_auth_token, None)
+    stored = _otp_store.pop(body.email.lower(), None)
     if stored is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired pre-auth token")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired OTP session")
 
     user_id, expected_otp, expiry = stored
 
     # Check expiry.
     if datetime.now(timezone.utc) > expiry:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="OTP has expired")
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="OTP has expired")
 
     # Validate OTP code.
-    if body.otp_code != expected_otp:
+    if body.otp != expected_otp:
+        # Put it back so user can retry.
+        _otp_store[body.email.lower()] = (user_id, expected_otp, expiry)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid OTP code")
 
     # Issue JWT.
