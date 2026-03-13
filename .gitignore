@@ -1,0 +1,52 @@
+# Environment and secrets
+.env
+.env.local
+.env.production
+*.pem
+*.key
+keyfile
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Node.js
+node_modules/
+.next/
+out/
+.turbo/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite3
+
+# Backups (stored on server, not in repo)
+backups/
+
+# PM2
+.pm2/
+
+# Alembic
+alembic/versions/*.pyc

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+
+    <key>Label</key>
+    <string>com.bezalel.imessagesync</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <!-- The setup script patches this to the venv python path -->
+        <string>/Users/USER/.bezalel_venv/bin/python3</string>
+        <string>/Users/USER/.bezalel_agent/bezalel_imessage_sync.py</string>
+    </array>
+
+    <key>StartInterval</key>
+    <integer>1800</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/USER/.bezalel_agent</string>
+
+    <key>StandardOutPath</key>
+    <string>/Users/USER/Library/Logs/bezalel_sync.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/USER/Library/Logs/bezalel_sync.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>BEZALEL_ENV_FILE</key>
+        <string>/Users/USER/.bezalel_env</string>
+    </dict>
+
+</dict>
+</plist>

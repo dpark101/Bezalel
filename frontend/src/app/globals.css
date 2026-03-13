@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bezalel-bg: #0a0a0f;
+  --bezalel-secondary: #12121a;
+  --bezalel-accent: #1a1a2e;
+  --bezalel-border: #2a2a3e;
+  --bezalel-text: #e0e0e8;
+  --bezalel-text-secondary: #8888a0;
+  --bezalel-highlight: #4a6cf7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--bezalel-bg);
+  color: var(--bezalel-text);
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bezalel-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bezalel-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bezalel-text-secondary);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bezalel-border) var(--bezalel-bg);
+}
+
+/* Smooth transitions */
+a,
+button,
+input,
+textarea,
+select {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Focus styles */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--bezalel-highlight);
+  box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.2);
+}
+
+/* Skeleton loading animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bezalel-accent) 25%,
+    var(--bezalel-border) 50%,
+    var(--bezalel-accent) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(74, 108, 247, 0.3);
+  color: var(--bezalel-text);
+}

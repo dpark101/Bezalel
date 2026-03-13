@@ -1,0 +1,1 @@
+"""Bezalel.AI — Middleware package."""

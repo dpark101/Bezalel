@@ -1,0 +1,10 @@
+# =============================================================================
+# Bezalel.AI — Backup Cron Schedule
+#
+# Run the daily backup at 2:00 AM (server local time, US/Eastern).
+# Install with: crontab /path/to/backup_cron
+# Or append with: crontab -l | cat - backup_cron | crontab -
+# =============================================================================
+
+# Daily database backup at 2:00 AM
+0 2 * * * /data/bezalel/deploy/scripts/backup.sh >> /data/bezalel/logs/backup_cron.log 2>&1
